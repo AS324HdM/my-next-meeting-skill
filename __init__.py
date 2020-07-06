@@ -1,6 +1,5 @@
 from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_file_handler
-from mycroft.util import LOG
 from datetime import datetime, timedelta, time, date
 import caldav
 from caldav.elements import dav, cdav
@@ -48,7 +47,7 @@ class MyNextMeeting(MycroftSkill):
             self.log.info(start, day, time)
             events.append([day, time, summary])
         events.sort()
-        self.log.info(events)
+        #self.log.info(events)
         #event = events[0]
         
         apmnt_Date = "June 22, 2020"
