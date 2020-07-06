@@ -9,7 +9,7 @@ from dateutil import tz
 
 class MyNextMeeting(MycroftSkill):
     def __init__(self):
-        MycroftSkill.__init__(self)
+        MycroftSkill.__init__()
 
     def initialize(self):
         self.settings_change_callback = self.on_settings_changed
@@ -24,7 +24,7 @@ class MyNextMeeting(MycroftSkill):
     def handle_meeting_next_my(self, message):
         self.login_to_nextcloud()
         apmnt_Date, apmnt_Time, apmnt_Title =  self.get_next_appointment_info()
-        self.LOG.info("cal:",self.caldav, self.userName, self.password)
+        self.log.info("cal:",self.caldav, self.userName, self.password)
         self.speak('Your next appointment is on {} at {} and is entitled {}'
             .format(apmnt_Date, apmnt_Time, apmnt_Title))
     
@@ -45,10 +45,10 @@ class MyNextMeeting(MycroftSkill):
             day = start.date().strftime('%d, %b %Y')
             time = start.time().strftime('%H:%M %p')
             summary = event.instance.vevent.summary.value
-            self.LOG.info(start, day, time)
+            self.log.info(start, day, time)
             events.append([day, time, summary])
         events.sort()
-        self.LOG.info(events)
+        self.log.info(events)
         #event = events[0]
         
         apmnt_Date = "June 22, 2020"
