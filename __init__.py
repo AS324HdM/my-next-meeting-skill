@@ -8,7 +8,7 @@ from dateutil import tz
 
 class MyNextMeeting(MycroftSkill):
     def __init__(self):
-        MycroftSkill.__init__()
+        MycroftSkill.__init__(self)
 
     def initialize(self):
         self.settings_change_callback = self.on_settings_changed
@@ -21,7 +21,7 @@ class MyNextMeeting(MycroftSkill):
 
     @intent_file_handler('meeting.next.my.intent')
     def handle_meeting_next_my(self, message):
-        #self.login_to_nextcloud()
+        self.login_to_nextcloud()
         apmnt_Date, apmnt_Time, apmnt_Title =  self.get_next_appointment_info()
         self.log.info("cal:",self.caldav, self.userName, self.password)
         self.speak('Your next appointment is on {} at {} and is entitled {}'
@@ -35,6 +35,23 @@ class MyNextMeeting(MycroftSkill):
         self.calendar = self.calendars[0]
 
     def get_next_appointment_info(self):
+        now = datetime.now()
+        end = now + timedelta(1)
+        results = self.calendar.date_search(now, end)
+        if not results:
+            self.log.warn("There is no event")
+        self.log.info(results)
+        #for event in results:
+        #    start = event.instance.vevent.dtstart.value
+        #    day = start.date().strftime('%d, %b %Y')
+        #    time = start.time().strftime('%H:%M %p')
+        #    summary = event.instance.vevent.summary.value
+        #    self.log.info("test")
+         #   events.append([day, time, summary])
+        #events.sort()
+        #self.log.info(events)
+        #event = events[0]
+        
         apmnt_Date = "June 22, 2020"
         apmnt_Time = "4 pm"
         apmnt_Title = "Speech Interaction class"
