@@ -33,8 +33,6 @@ class MyNextMeeting(MycroftSkill):
         self.principal = self.client.principal()
         self.calendars = self.principal.calendars()
         self.calendar = self.calendars[0]
-        self.speak('Calendar {}'
-            .format(self.calendar))
 
     def get_next_appointment_info(self):
         apmnt_Date = "June 22, 2020"
