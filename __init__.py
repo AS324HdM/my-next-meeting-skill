@@ -46,7 +46,7 @@ class MyNextMeeting(MycroftSkill):
             summary = event.instance.vevent.summary.value
             self.log.info(start)
             events.append([day, time, summary])
-        #events.sort()
+        events.sort()
         #event = events[0]
         
         apmnt_Date = "June 22, 2020"
