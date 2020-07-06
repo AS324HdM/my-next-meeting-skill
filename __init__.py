@@ -13,7 +13,6 @@ class MyNextMeeting(MycroftSkill):
     def initialize(self):
         self.settings_change_callback = self.on_settings_changed
         self.on_settings_changed()
-        self.login_to_nextcloud()
 
     def on_settings_changed(self):
         self.caldav = self.settings.get('caldav')
@@ -22,6 +21,7 @@ class MyNextMeeting(MycroftSkill):
 
     @intent_file_handler('meeting.next.my.intent')
     def handle_meeting_next_my(self, message):
+        self.login_to_nextcloud()
         apmnt_Date, apmnt_Time, apmnt_Title =  self.get_next_appointment_info()
         self.speak('Your next appointment is on {} at {} and is entitled {}'
             .format(apmnt_Date, apmnt_Time, apmnt_Title))
