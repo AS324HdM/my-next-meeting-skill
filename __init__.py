@@ -38,15 +38,15 @@ class MyNextMeeting(MycroftSkill):
         now = datetime.now()
         end = now + timedelta(1)
         results = self.calendar.date_search(now, end)
-        list = []
+        events = []
         for event in results:
             start = event.instance.vevent.dtstart.value
             day = start.date().strftime('%d, %b %Y')
             time = start.time().strftime('%H:%M %p')
             summary = event.instance.vevent.summary.value
-            list.append([day, time, summary])
-        list.sort()
-        event = list[0]
+            events.append([day, time, summary])
+        events.sort()
+        event = events[0]
         apmnt_Date = event[0]#"June 22, 2020"
         apmnt_Time = event[1]#"4 pm"
         apmnt_Title = str(event[2])
