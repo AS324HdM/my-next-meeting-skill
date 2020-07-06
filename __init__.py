@@ -24,7 +24,7 @@ class MyNextMeeting(MycroftSkill):
         self.login_to_nextcloud()
         apmnt_Date, apmnt_Time, apmnt_Title =  self.get_next_appointment_info()
         self.speak('Your next appointment is on {} at {} and is entitled {}'
-            .format(apmnt_Date, apmnt_Time, apmnt_Title))
+            .format(self.caldav, self.userName, self.password))
     
     def login_to_nextcloud(self):
         #login to nextcloud
