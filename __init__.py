@@ -36,6 +36,9 @@ class MyNextMeeting(MycroftSkill):
 
     def get_next_appointment_info(self):
         now = datetime.now()
+        end = now + timedelta(1)
+        results = self.calendar.date_search(now, end)
+        events = []
         apmnt_Date = "June 22, 2020"
         apmnt_Time = "4 pm"
         apmnt_Title = "Speech Interaction class"
