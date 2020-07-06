@@ -44,7 +44,7 @@ class MyNextMeeting(MycroftSkill):
             day = start.date().strftime('%d, %b %Y')
             time = start.time().strftime('%H:%M %p')
             summary = event.instance.vevent.summary.value
-            self.log.info(start, day, time)
+            self.log.info("test")
             events.append([day, time, summary])
         events.sort()
         #self.log.info(events)
