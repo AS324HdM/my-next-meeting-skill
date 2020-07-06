@@ -45,6 +45,9 @@ class MyNextMeeting(MycroftSkill):
             time = start.time().strftime('%H:%M %p')
             summary = event.instance.vevent.summary.value
             events.append([day, time, summary])
+        events.sort()
+        event = events[0]
+        self.log.info(event)
         apmnt_Date = "June 22, 2020"
         apmnt_Time = "4 pm"
         apmnt_Title = "Speech Interaction class"
