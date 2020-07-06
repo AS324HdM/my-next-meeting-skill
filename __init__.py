@@ -1,5 +1,6 @@
 from adapt.intent import IntentBuilder
 from mycroft import MycroftSkill, intent_file_handler
+from mycroft.util import LOG
 from datetime import datetime, timedelta, time, date
 import caldav
 from caldav.elements import dav, cdav
@@ -23,7 +24,7 @@ class MyNextMeeting(MycroftSkill):
     def handle_meeting_next_my(self, message):
         self.login_to_nextcloud()
         apmnt_Date, apmnt_Time, apmnt_Title =  self.get_next_appointment_info()
-        self.log.info("cal:",self.caldav, self.userName, self.password)
+        self.LOG.info("cal:",self.caldav, self.userName, self.password)
         self.speak('Your next appointment is on {} at {} and is entitled {}'
             .format(apmnt_Date, apmnt_Time, apmnt_Title))
     
@@ -44,10 +45,11 @@ class MyNextMeeting(MycroftSkill):
             day = start.date().strftime('%d, %b %Y')
             time = start.time().strftime('%H:%M %p')
             summary = event.instance.vevent.summary.value
-            self.log.info(start)
+            self.LOG.info(start, day, time)
             events.append([day, time, summary])
         events.sort()
-        event = events[0]
+        self.LOG.info(events)
+        #event = events[0]
         
         apmnt_Date = "June 22, 2020"
         apmnt_Time = "4 pm"
