@@ -38,15 +38,17 @@ class MyNextMeeting(MycroftSkill):
         now = datetime.now()
         end = now + timedelta(1)
         results = self.calendar.date_search(now, end)
-        events = []
-        for event in results:
-            start = event.instance.vevent.dtstart.value
-            day = start.date().strftime('%d, %b %Y')
-            time = start.time().strftime('%H:%M %p')
-            summary = event.instance.vevent.summary.value
-            self.log.info("test")
-            events.append([day, time, summary])
-        events.sort()
+        if not results:
+            self.log.warn("There is no event")
+        self.log.info(results)
+        #for event in results:
+        #    start = event.instance.vevent.dtstart.value
+        #    day = start.date().strftime('%d, %b %Y')
+        #    time = start.time().strftime('%H:%M %p')
+        #    summary = event.instance.vevent.summary.value
+        #    self.log.info("test")
+         #   events.append([day, time, summary])
+        #events.sort()
         #self.log.info(events)
         #event = events[0]
         
