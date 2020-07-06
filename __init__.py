@@ -39,7 +39,7 @@ class MyNextMeeting(MycroftSkill):
     def get_next_appointment_info(self):
         now = datetime.now()
         end = now + timedelta(1)
-        results = calendar.date_search(now, end)
+        results = self.calendar.date_search(now, end)
         list = []
         for event in results:
             start = event.instance.vevent.dtstart.value
