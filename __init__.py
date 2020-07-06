@@ -15,9 +15,9 @@ class MyNextMeeting(MycroftSkill):
         self.on_settings_changed()
 
     def on_settings_changed(self):
-        self.caldav = self.settings.get('caldav')
         self.userName = self.settings.get('username')
         self.password = self.settings.get('password')
+        self.caldav = "https://{}:{}@next.social-robot.info/nc/remote.php/dav".format(self.username, self.password)
 
     @intent_file_handler('meeting.next.my.intent')
     def handle_meeting_next_my(self, message):

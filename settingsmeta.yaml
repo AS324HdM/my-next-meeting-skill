@@ -4,11 +4,7 @@ skillMetadata:
     - name: NextCloud Calendar Credentials
       fields:
         - type: label
-          label: Set your Nextcloud Calendar credentials
-        - name: caldav
-          type: text
-          label: CalDav Adresse
-          value: ""
+          label: Set your Nextcloud Calendar credentials"
         - name: username
           type: text
           label: Username
