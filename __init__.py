@@ -35,23 +35,6 @@ class MyNextMeeting(MycroftSkill):
         self.calendar = self.calendars[0]
 
     def get_next_appointment_info(self):
-        now = datetime.now()
-        end = now + timedelta(1)
-        results = self.calendar.date_search(now, end)
-        if not results:
-            self.log.warn("There is no event")
-        self.log.info(results)
-        #for event in results:
-        #    start = event.instance.vevent.dtstart.value
-        #    day = start.date().strftime('%d, %b %Y')
-        #    time = start.time().strftime('%H:%M %p')
-        #    summary = event.instance.vevent.summary.value
-        #    self.log.info("test")
-         #   events.append([day, time, summary])
-        #events.sort()
-        #self.log.info(events)
-        #event = events[0]
-        
         apmnt_Date = "June 22, 2020"
         apmnt_Time = "4 pm"
         apmnt_Title = "Speech Interaction class"
