@@ -21,7 +21,7 @@ class MyNextMeeting(MycroftSkill):
 
     @intent_file_handler('meeting.next.my.intent')
     def handle_meeting_next_my(self, message):
-        self.login_to_nextcloud()
+        #self.login_to_nextcloud()
         apmnt_Date, apmnt_Time, apmnt_Title =  self.get_next_appointment_info()
         self.log.info("cal:",self.caldav, self.userName, self.password)
         self.speak('Your next appointment is on {} at {} and is entitled {}'
