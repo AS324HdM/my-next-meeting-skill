@@ -39,6 +39,12 @@ class MyNextMeeting(MycroftSkill):
         end = now + timedelta(1)
         results = self.calendar.date_search(now, end)
         events = []
+        for event in results:
+            start = event.instance.vevent.dtstart.value
+            day = start.date().strftime('%d, %b %Y')
+            time = start.time().strftime('%H:%M %p')
+            summary = event.instance.vevent.summary.value
+            events.append([day, time, summary])
         apmnt_Date = "June 22, 2020"
         apmnt_Time = "4 pm"
         apmnt_Title = "Speech Interaction class"
