@@ -36,21 +36,27 @@ class MyNextMeeting(MycroftSkill):
         self.calendars = self.principal.calendars()
         self.calendar = self.calendars[0]
 
-    def get_next_appointment_info(self):
-        now = datetime.now()
-        end = now + timedelta(1)
-        results = self.calendar.date_search(now, end)
+    def get_next_appointment_info(self, From=None, Until=None, Days=30):
+        start = datetime.now()
+        if From:
+            start = From
+        end = start + timedelta(Days)
+        if Until:
+            end = Until
+        results = self.calendar.date_search(start, end)
         if not results:
             self.log.info("There is no event")
             return "","",""
         events = []
         for event in results:
-            start = event.instance.vevent.dtstart.value
-            day = start.date().strftime('%d, %b %Y')
-            time = start.time().strftime('%H:%M %p')
+            start_e = event.instance.vevent.dtstart.value
+            if not hasattr(start_e, 'time'):
+                start_e = datetime.combine(start_e, datetime.min.time())
+            day = start_e.date().strftime('%d, %b %Y')
+            time = start_e.time().strftime('%H:%M %p')
             summary = event.instance.vevent.summary.value
             events.append([day, time, summary])
-        events.sort()
+        events = sorted(events, key=lambda event: event[1] and event[0]) 
         event = events[0]
         apmnt_Date = event[0]#"June 22, 2020"
         apmnt_Time = event[1]#"4 pm"
