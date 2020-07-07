@@ -5,7 +5,6 @@ import caldav
 from caldav.elements import dav, cdav
 from dateutil import tz
 
-
 class MyNextMeeting(MycroftSkill):
     def __init__(self):
         MycroftSkill.__init__(self)
@@ -24,8 +23,11 @@ class MyNextMeeting(MycroftSkill):
         self.login_to_nextcloud()
         apmnt_Date, apmnt_Time, apmnt_Title =  self.get_next_appointment_info()
         self.log.info("cal:",self.caldav, self.userName, self.password)
-        self.speak('Your next appointment is on {} at {} and is entitled {}'
-            .format(apmnt_Date, apmnt_Time, apmnt_Title))
+        if(len(apmnt_Date) > 0):
+            self.speak('Your next appointment is on {} at {} and is entitled {}'
+                .format(apmnt_Date, apmnt_Time, apmnt_Title))
+        else:
+            self.speak('You Don\'t have any appointments planned')
     
     def login_to_nextcloud(self):
         #login to nextcloud
@@ -39,22 +41,20 @@ class MyNextMeeting(MycroftSkill):
         end = now + timedelta(1)
         results = self.calendar.date_search(now, end)
         if not results:
-            self.log.warn("There is no event")
-        self.log.info(results)
-        #for event in results:
-        #    start = event.instance.vevent.dtstart.value
-        #    day = start.date().strftime('%d, %b %Y')
-        #    time = start.time().strftime('%H:%M %p')
-        #    summary = event.instance.vevent.summary.value
-        #    self.log.info("test")
-         #   events.append([day, time, summary])
-        #events.sort()
-        #self.log.info(events)
-        #event = events[0]
-        
-        apmnt_Date = "June 22, 2020"
-        apmnt_Time = "4 pm"
-        apmnt_Title = "Speech Interaction class"
+            self.log.info("There is no event")
+            return "","",""
+        events = []
+        for event in results:
+            start = event.instance.vevent.dtstart.value
+            day = start.date().strftime('%d, %b %Y')
+            time = start.time().strftime('%H:%M %p')
+            summary = event.instance.vevent.summary.value
+            events.append([day, time, summary])
+        events.sort()
+        event = events[0]
+        apmnt_Date = event[0]#"June 22, 2020"
+        apmnt_Time = event[1]#"4 pm"
+        apmnt_Title = str(event[2])
         return apmnt_Date, apmnt_Time, apmnt_Title
 
     def stop(self):
