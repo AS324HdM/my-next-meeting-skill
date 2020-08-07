@@ -2,7 +2,7 @@
 Reads your next appointment from nextcloud calendar
 
 ## About
-Answers with you next appointment it reads from you private nextcloud calendar
+Answers with your next appointment, it reads from your private NextCloud calendar
 
 ## Examples
 * "When is my next meeting"
