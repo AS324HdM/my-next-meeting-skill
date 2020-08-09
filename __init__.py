@@ -105,9 +105,6 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             start = from_start
         end = start + timedelta(days)
         results = self.calendar.date_search(start, end)
-        if results is None:
-            self.log.info("There is no event")
-            return "", "", ""
         events = []
         for event in results:
             start_e = event.instance.vevent.dtstart.value
@@ -117,12 +114,15 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             day_time = start_e.time().strftime('%H:%M %p')
             summary = event.instance.vevent.summary.value
             events.append([day, day_time, summary])
-        events = sorted(events, key=lambda event: event[1] and event[0])
-        event = events[0]
-        apmnt_date = event[0]#"F.e. June 22, 2020"
-        apmnt_time = event[1]#"F.e. 4 pm"
-        apmnt_title = str(event[2])
-        return apmnt_date, apmnt_time, apmnt_title
+        if len(events) > 0:
+            events = sorted(events, key=lambda event: event[1] and event[0])
+            event = events[0]
+            apmnt_date = event[0]#"F.e. June 22, 2020"
+            apmnt_time = event[1]#"F.e. 4 pm"
+            apmnt_title = str(event[2])
+            return apmnt_date, apmnt_time, apmnt_title
+        self.log.info("There is no event")
+        return "", "", ""
 
 
 def create_skill():
