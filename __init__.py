@@ -128,6 +128,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         events = []
         for event in results:
             start_e = event.instance.vevent.dtstart.value
+            start_e = start_e.astimezone(get_localzone())
             if not hasattr(start_e, 'time'):
                 start_e = datetime.combine(start_e, datetime.min.time())
             day = start_e.date()
@@ -159,9 +160,8 @@ def get_nice_event(event):
         apmnt_time (str): The Time of the occasion nicely spoken String.
         apmnt_title (str): The Title of the Appointment.
     """
-    local_time = event[1].astimezone(get_localzone())
     apmnt_date = nice_date(event[0])
-    apmnt_time = nice_time(local_time, speech=False, use_ampm=True)
+    apmnt_time = nice_time(event[1], speech=False, use_ampm=True)
     apmnt_title = str(event[2])
     return apmnt_date, apmnt_time, apmnt_title
 
