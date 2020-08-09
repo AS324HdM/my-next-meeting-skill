@@ -128,7 +128,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         events = []
         for event in results:
             start_e = event.instance.vevent.dtstart.value
-            start_e = start_e.astimezone(get_localzone())
+            #start_e = start_e.astimezone(get_localzone())
             if not hasattr(start_e, 'time'):
                 start_e = datetime.combine(start_e, datetime.min.time())
             day = start_e.date()
