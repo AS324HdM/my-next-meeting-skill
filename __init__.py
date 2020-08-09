@@ -14,7 +14,7 @@ They include neccessary login information for NextCloud.
 from datetime import datetime, timedelta, time, date
 import caldav
 from caldav.elements import dav, cdav
-from dateutil import tz
+from tzlocal import get_localzone
 from adapt.intent import IntentBuilder # import for Mycroft only works internaly pylint: disable=import-error
 from mycroft import MycroftSkill, intent_file_handler # import for Mycroft only works internaly pylint: disable=import-error
 from mycroft.util.format import nice_date, nice_duration, nice_time # import for Mycroft only works internaly pylint: disable=import-error
@@ -159,8 +159,7 @@ def get_nice_event(event):
         apmnt_time (str): The Time of the occasion nicely spoken String.
         apmnt_title (str): The Title of the Appointment.
     """
-    time_zone = tz.gettz('Europe/Berlin')
-    local_time = datetime(event[1], tzinfo=time_zone)
+    local_time = event[1].astimezone(get_localzone())
     apmnt_date = nice_date(event[0])
     apmnt_time = nice_time(local_time, speech=False, use_ampm=True)
     apmnt_title = str(event[2])
