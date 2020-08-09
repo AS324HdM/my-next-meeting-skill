@@ -100,6 +100,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             apmnt_time (str): The Time of the occasion.
             apmnt_title (str): The Title of the Appointment.
         """
+        start = datetime.now()
         if from_start is not None:
             start = from_start
         end = start + timedelta(days)
