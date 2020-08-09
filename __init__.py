@@ -17,6 +17,7 @@ from caldav.elements import dav, cdav
 from dateutil import tz
 from adapt.intent import IntentBuilder # import for Mycroft only works internaly pylint: disable=import-error
 from mycroft import MycroftSkill, intent_file_handler # import for Mycroft only works internaly pylint: disable=import-error
+from mycroft.util.format import nice_date, nice_duration, nice_time # import for Mycroft only works internaly pylint: disable=import-error
 
 class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-many-instance-attributes
     """Main Class for the Skill.
@@ -59,23 +60,6 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         self.caldav = "https://{}:{}@next.social-robot.info/nc/remote.php/dav" \
             .format(user_name, password)
 
-    @intent_file_handler('meeting.next.my.intent')
-    def handle_meeting_next_my(self):
-        """Method is called when user speaks an intent in ``meeting.next.my.intent``.
-
-        Calls the methods login_to_nextcloud() and get_next_appointment_info() to get
-        the info of the users next appointment and gives the answer.
-
-        speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
-        """
-        self.login_to_nextcloud()
-        apmnt_date, apmnt_time, apmnt_title = self.get_next_appointment_info()
-        if len(apmnt_date) > 0:
-            self.speak('Your next appointment is on {} at {} and is entitled {}' \
-                .format(apmnt_date, apmnt_time, apmnt_title))
-        else:
-            self.speak('You Don\'t have any appointments planned')
-
     def login_to_nextcloud(self):
         """Log in to NextCloud and get the calendar.
 
@@ -86,7 +70,43 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         calendars = principal.calendars()
         self.calendar = calendars[0]
 
-    def get_next_appointment_info(self, from_start=None, days=30):
+    @intent_file_handler('meeting.next.my.intent')
+    def handle_meeting_next_my(self):
+        """Method is called when user speaks an intent in ``meeting.next.my.intent``.
+
+        Calls the methods login_to_nextcloud() and get_next_appointment_info() to get
+        the info of the users next appointment and gives the answer.
+
+        speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
+        """
+        self.login_to_nextcloud()
+        apmnt_date, apmnt_time, apmnt_title = self.get_appointment_info()
+        if len(apmnt_date) > 0:
+            self.speak_dialog('meeting.next.my', \
+                data={"date": apmnt_date, "time": apmnt_time, "title": apmnt_title})
+        else:
+            self.speak('You Don\'t have any appointments planned')
+
+    @intent_file_handler('meetings.at.day.intent')
+    def handle_meetings_at_day(self, message):
+        """Method is called when user speaks an intent in ``meeting.next.my.intent``.
+
+        Calls the methods login_to_nextcloud() and get_next_appointment_info() to get
+        the info of the users next appointment and gives the answer.
+
+        speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
+        """
+        self.login_to_nextcloud()
+        day = message.data.get('day')
+        apmnt_date, apmnt_time, apmnt_title = \
+            self.get_appointment_info(from_start=day, days=1, get_next=False)
+        if len(apmnt_date) > 0:
+            self.speak_dialog('location.error', \
+                data={"date": apmnt_date, "time": apmnt_time, "title": apmnt_title})
+        else:
+            self.speak('You Don\'t have any appointments planned')
+
+    def get_appointment_info(self, from_start=None, days=30, get_next=True):
         """Get the next appointment from the NextCloud calendar.
 
         Args:
@@ -103,27 +123,46 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         start = datetime.now()
         if from_start is not None:
             start = from_start
-        end = start + timedelta(days)
+        end = start + timedelta(days-1)
         results = self.calendar.date_search(start, end)
         events = []
         for event in results:
             start_e = event.instance.vevent.dtstart.value
             if not hasattr(start_e, 'time'):
                 start_e = datetime.combine(start_e, datetime.min.time())
-            day = start_e.date().strftime('%d, %b %Y')
-            day_time = start_e.time().strftime('%H:%M %p')
+            day = start_e.date()
+            day_time = start_e.time()
             summary = event.instance.vevent.summary.value
             events.append([day, day_time, summary])
         if len(events) > 0:
             events = sorted(events, key=lambda event: event[1] and event[0])
-            event = events[0]
-            apmnt_date = event[0]#"F.e. June 22, 2020"
-            apmnt_time = event[1]#"F.e. 4 pm"
-            apmnt_title = str(event[2])
-            return apmnt_date, apmnt_time, apmnt_title
+            if get_next:
+                event = events[0]
+                return get_nice_event(events[0])
+            return [get_nice_event(event) for event in events]
         self.log.info("There is no event")
         return "", "", ""
 
+def get_nice_event(event):
+    """Transforms Events nicely spoken for Mycroft.
+
+    nice_date() and nice_time() are functions from Mycroft.util.format that
+    uses Lingua Franca to transform numbers and dates etc. to words.
+    see mycroft.ai documentation at:
+    https://mycroft-ai.gitbook.io/docs/mycroft-technologies/lingua-franca
+
+    Args:
+        events: Events extracted from Nextcloud.
+
+    Returns:
+        apmnt_date (str): The Date of the next appointment  nicely spoken String.
+        apmnt_time (str): The Time of the occasion nicely spoken String.
+        apmnt_title (str): The Title of the Appointment.
+    """
+    apmnt_date = nice_date(event[0])
+    apmnt_time = nice_time(event[1], speech=False, use_ampm=True)
+    apmnt_title = str(event[2])
+    return apmnt_date, apmnt_time, apmnt_title
 
 def create_skill():
     """Create the skill instance

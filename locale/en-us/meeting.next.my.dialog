@@ -1,0 +1,3 @@
+Your next appointment is on {{date}} at {{time}} and is entitled {{title}}
+Your next appointment is on {{date}} at {{time}}
+Your next appointment is on {{date}}

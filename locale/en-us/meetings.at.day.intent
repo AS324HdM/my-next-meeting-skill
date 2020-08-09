@@ -1,0 +1,3 @@
+what (appointments | meetings) do I have (at | on) {day} of {month}
+what (appointments | meetings) do I have (at | on) {monthday}
+Do I have (an appointment | a meeting | appointments | meetings) (at | on) {day}
