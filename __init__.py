@@ -159,8 +159,10 @@ def get_nice_event(event):
         apmnt_time (str): The Time of the occasion nicely spoken String.
         apmnt_title (str): The Title of the Appointment.
     """
+    time_zone = tz.gettz('Europe/Berlin')
+    local_time = tz.resolve_imaginary(datetime(event[1], tzinfo=time_zone))
     apmnt_date = nice_date(event[0])
-    apmnt_time = nice_time(event[1], speech=False, use_ampm=True)
+    apmnt_time = nice_time(local_time, speech=False, use_ampm=True)
     apmnt_title = str(event[2])
     return apmnt_date, apmnt_time, apmnt_title
 
