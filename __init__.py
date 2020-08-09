@@ -14,7 +14,7 @@ They include neccessary login information for NextCloud.
 from datetime import datetime, timedelta, time, date
 import caldav
 from caldav.elements import dav, cdav
-from tzlocal import get_localzone
+# from tzlocal import get_localzone
 from adapt.intent import IntentBuilder # import for Mycroft only works internaly pylint: disable=import-error
 from mycroft import MycroftSkill, intent_file_handler # import for Mycroft only works internaly pylint: disable=import-error
 from mycroft.util.format import nice_date, nice_duration, nice_time # import for Mycroft only works internaly pylint: disable=import-error
@@ -96,15 +96,10 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
 
         speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
         """
-        self.login_to_nextcloud()
-        day = message.data.get('day')
-        apmnt_date, apmnt_time, apmnt_title = \
-            self.get_appointment_info(from_start=day, days=1, get_next=False)
-        if len(apmnt_date) > 0:
-            self.speak_dialog('location.error', \
-                data={"date": apmnt_date, "time": apmnt_time, "title": apmnt_title})
-        else:
-            self.speak('You Don\'t have any appointments planned')
+        # self.login_to_nextcloud()
+        print(message.data)
+        # apmnt_date, apmnt_time, apmnt_title = \
+            # self.get_appointment_info(from_start=day, days=1, get_next=False)
 
     def get_appointment_info(self, from_start=None, days=30, get_next=True):
         """Get the next appointment from the NextCloud calendar.
