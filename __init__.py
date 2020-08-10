@@ -126,7 +126,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         events = []
         for event in results:
             start_e = event.instance.vevent.dtstart.value
-            if type(event[0]) is not datetime.date:
+            if type(start_e[0]) is not datetime.date:
                 start_e = utc_to_local(start_e)
             summary = event.instance.vevent.summary.value
             events.append([start_e, summary])
