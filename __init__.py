@@ -138,7 +138,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         """
         date_full = date_u.strftime("%Y%m%d")
         now = datetime.now().strftime("%Y%m%dT%H%M%SZ")
-        uid = self.calendar.timegm(time.gmtime())
+        uid = datetime.now().timestamp()
         new_event = """BEGIN:VCALENDAR
         VERSION:2.0
         PRODID:-//Example Corp.//CalDAV Client//EN
