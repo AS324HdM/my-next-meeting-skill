@@ -106,7 +106,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         """
         try:
             start = get_date(message.data)
-            list_of_events = self.get_appointment_info(from_start=start, days=1.1, get_next=False)
+            list_of_events = self.get_appointment_info(from_start=start, days=1, get_next=False)
             if len(list_of_events) > 0:
                 self.log.info(list_of_events)
                 events_string = ' and '.join(event[1]+event[0]\
@@ -221,7 +221,8 @@ END:VCALENDAR"""
         """
         start = datetime.utcnow()
         if from_start is not None:
-            start = from_start
+            start = from_start + timedelta(0)
+            self.log.info(start)
         end = start + timedelta(days)
         self.log.info(end)
         results = self.calendar.date_search(start, end)

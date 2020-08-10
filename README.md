@@ -4,6 +4,12 @@ Reads your next appointment from nextcloud calendar
 ## About
 Answers with your next appointment, it reads from your private NextCloud calendar
 
+## Install
+msm -l install https://github.com/AS324/my-next-meeting-skill
+
+## Update
+msm -l update https://github.com/AS324/my-next-meeting-skill
+
 ## Examples
 * "When is my next meeting"
 * "Next meeting"
