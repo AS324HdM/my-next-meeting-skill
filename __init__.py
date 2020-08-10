@@ -106,7 +106,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         """
         try:
             start = get_date(message.data)
-            list_of_events = self.get_appointment_info(start, 1, False)
+            list_of_events = self.get_appointment_info(from_start=start, days=1.1, get_next=False)
             if len(list_of_events) > 0:
                 self.log.info(list_of_events)
                 events_string = ' and '.join(event[1]+event[0]\
@@ -184,8 +184,6 @@ END:VCALENDAR"""
         except TypeError:
             self.speak('Sorry, no event to delete, I need you to tell me a month and day')
 
-
-
     @intent_file_handler('meeting.rename.intent')
     def handle_meeting_rename(self, message):
         """Method is called when user speaks an intent in ``meeting.next.my.intent``.
@@ -243,6 +241,7 @@ END:VCALENDAR"""
                 return get_nice_event(events[0])
             return [get_nice_event(event, True) for event in events]
         self.log.info("There is no event")
+        if get_next: return []
         return "", ""
 
     def utc_to_local(self, date_arg):
