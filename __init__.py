@@ -225,6 +225,7 @@ END:VCALENDAR"""
         if from_start is not None:
             start = from_start
         end = start + timedelta(days)
+        self.log.info(end)
         results = self.calendar.date_search(start, end)
         events = []
         for event in results:
