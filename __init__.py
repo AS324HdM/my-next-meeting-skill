@@ -140,16 +140,15 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         now = datetime.now().strftime("%Y%m%dT%H%M%SZ")
         uid = datetime.now().timestamp()
         new_event = """BEGIN:VCALENDAR
-        VERSION:2.0
-        PRODID:-//Example Corp.//CalDAV Client//EN
-        BEGIN:VEVENT
-        UID: {}
-        DTSTAMP:{}
-        DTVALUE:{}
-        SUMMARY:{}
-        END:VEVENT
-        END:VCALENDAR
-        """.format(uid, now, date_full, name)
+            VERSION:2.0
+            PRODID:-//Example Corp.//CalDAV Client//EN
+            BEGIN:VEVENT
+            UID: {}
+            DTSTAMP:{}
+            DTVALUE:{}
+            SUMMARY:{}
+            END:VEVENT
+            END:VCALENDAR""".format(uid, now, date_full, name)
         self.calendar.save_event(new_event)
         self.log.info('Create event was successful')
         return True
