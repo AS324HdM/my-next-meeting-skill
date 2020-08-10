@@ -20,6 +20,7 @@ import caldav
 from caldav.elements import dav, cdav
 # from tzlocal import get_localzone
 from adapt.intent import IntentBuilder # import for Mycroft only works internaly pylint: disable=import-error
+from mycroft.util.parse import extract_duration, extract_datetime # import for Mycroft only works internaly pylint: disable=import-error
 from mycroft import MycroftSkill, intent_file_handler # import for Mycroft only works internaly pylint: disable=import-error
 from mycroft.util.format import nice_date, nice_date_time # import for Mycroft only works internaly pylint: disable=import-error
 
@@ -56,7 +57,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         """
         self.register_entity_file('day.entity')
         self.register_entity_file('month.entity')
-        self.register_entity_file('weekday.entity')
+        self.register_entity_file('time.entity')
         self.settings_change_callback = self.on_settings_changed # pylint: disable=attribute-defined-outside-init
         self.on_settings_changed()
 
@@ -83,7 +84,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
     def handle_meeting_next_my(self):
         """Method is called when user speaks an intent in ``meeting.next.my.intent``.
 
-        Calls the methods login_to_nextcloud() and get_next_appointment_info() to get
+        Calls the methods login_to_nextcloud() and get_appointment_info() to get
         the info of the users next appointment and gives the answer.
 
         speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
@@ -98,22 +99,17 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
 
     @intent_file_handler('meetings.at.day.intent')
     def handle_meetings_at_day(self, message):
-        """Method is called when user speaks an intent in ``meeting.next.my.intent``.
+        """Method is called when user speaks an intent in ``meetings.at.day.intent``.
 
-        Calls the methods login_to_nextcloud() and get_next_appointment_info() to get
-        the info of the users next appointment and gives the answer.
+        Calls the methods login_to_nextcloud() and get_appointment_info() to get
+        the info of the users next appointment and gives the answer, for a specific day.
 
         speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
         """
-        # self.login_to_nextcloud()
         self.login_to_nextcloud()
         print("Handle day intent")
         print(message.data)
-        day = int(re.findall(r'\d+', message.data.get('day'))[0])
-        month = month_to_num(message.data.get('month'))
-        now = datetime.now()
-        year = int(now.year)
-        start = datetime(year, month, day)
+        start = get_date(message.data)
         list_of_events = self.get_appointment_info(start, 1, False)
         if len(list_of_events) > 0:
             events_string = ' and '.join(event[1]+event[0]\
@@ -123,6 +119,61 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
                     events_string)
         else:
             self.speak('You Don\'t have any appointments planned')
+
+    @intent_file_handler('meeting.create.intent')
+    def handle_meeting_create(self, message):
+        """Method is called when user speaks an intent in ``meeting.next.my.intent``.
+
+        Calls the methods login_to_nextcloud() and get_next_appointment_info() to get
+        the info of the users next appointment and gives the answer.
+
+        speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
+        """
+        name = message.data.get('name')
+        date_u = extract_datetime(message.data.get('date'))[0]
+        duration = extract_duration(message.data.get('duration'))[0]
+
+        success = self.create_event(name, date_u, duration)
+        if success:
+            self.speak_dialog('meeting created')
+        else:
+            self.speak('Sorry, meeting could not be created, try'+ \
+                '"Set up an appointment with the name <name> on <date> for <duration>')
+
+    def createEvent(self, name, date_u, duration):
+        """Create an event for the NextCloud calendar.
+        Args:
+            name (string): The name of the event.
+            date_u (datetime): The date of the event.
+            duration (timedelta): Duration of the event.
+
+        Returns:
+            True if succeeds, else False
+        """
+        try:
+            start = date_u.strftime("%Y%m%dT%H%M%SZ")
+            end = date_u + duration
+            end = start.strftime("%Y%m%dT%H%M%SZ")
+            now = datetime.now().strftime("%Y%m%dT%H%M%SZ")
+            uid = self.calendar.timegm(time.gmtime())
+            newEvent = """BEGIN:VCALENDAR
+            VERSION:2.0
+            PRODID:-//Example Corp.//CalDAV Client//EN
+            BEGIN:VEVENT
+            UID: {}
+            DTSTAMP:{}
+            DTSTART:{}
+            DTEND:{}
+            SUMMARY:{}
+            END:VEVENT
+            END:VCALENDAR
+            """.format(uid, now, start, end, name)
+            self.calendar.save_event(newEvent) 
+            self.log.info('Create event was successful')
+            return True
+        except:
+            self.log.info('Create event failed')
+            return False
 
     def get_appointment_info(self, from_start=None, days=30, get_next=True):
         """Get the next appointment from the NextCloud calendar.
@@ -175,6 +226,13 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         """
         time_zone = tz(self.timezone)
         return dt.astimezone(time_zone).replace(tzinfo=None)
+
+def get_date(message_data):
+    day = int(re.findall(r'\d+', message_data.get('day'))[0])
+    month = month_to_num(message_data.get('month'))
+    now = datetime.now()
+    year = int(now.year)
+    return datetime(year, month, day)
 
 def get_nice_event(event, is_on_date=False):
     """Transforms Events nicely spoken for Mycroft.

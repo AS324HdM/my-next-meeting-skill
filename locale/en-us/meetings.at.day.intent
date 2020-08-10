@@ -1,8 +1,6 @@
 what (appointments | meetings) do I have (at | on) the {day} of {month}
 what (appointments | meetings) do I have (at | on) {day} of {month}
 what (appointments | meetings) do I have (at | on) {month} {day}
-what (appointments | meetings) do I have (at | on) {weekday}
 Do I have (an appointment | a meeting | appointments | meetings | time) (at | on) the {day} of {month}
 Do I have (an appointment | a meeting | appointments | meetings | time) (at | on) {day} of {month}
 Do I have (an appointment | a meeting | appointments | meetings | time) (at | on) {month} {day}
-Do I have (an appointment | a meeting | appointments | meetings | time) (at | on) {weekday}
