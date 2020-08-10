@@ -101,6 +101,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
         """
         # self.login_to_nextcloud()
+        self.login_to_nextcloud()
         print("Handle day intent")
         print(message.data)
         day = int(re.findall(r'\d+', message.data.get('day'))[0])
@@ -141,14 +142,14 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         for event in results:
             start_e = event.instance.vevent.dtstart.value
             print(start_e)
-            if isinstance(start_e, datetime):
+            if type(start_e) is datetime:
                 start_e = utc_to_local(start_e)
             summary = event.instance.vevent.summary.value
             events.append([start_e, summary])
         if len(events) > 0:
             events = sorted(events, key=lambda event: \
                 datetime.combine(event[0], datetime.min.time())\
-                    if isinstance(event[0], date) else event[0])
+                    if type(event[0]) is date else event[0])
             if get_next:
                 event = events[0]
                 return get_nice_event(events[0])
@@ -185,7 +186,7 @@ def get_nice_event(event):
         apmnt_title (str): The Title of the Appointment.
     """
     print(event)
-    if isinstance(event[0], date):
+    if type(event[0]) is date:
         apmnt_date_time = nice_date(event[0]) + ", all day "
     else:
         apmnt_date_time = nice_date_time(event[0])
