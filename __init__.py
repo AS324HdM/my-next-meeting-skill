@@ -169,7 +169,7 @@ def utc_to_local(utc_dt):
         (datetime): Local datetime Object
 
     """
-    return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
+    return utc_dt.replace(tzinfo='Europe/Berlin').astimezone(tz=None)
 
 def get_nice_event(event, is_on_date=False):
     """Transforms Events nicely spoken for Mycroft.
