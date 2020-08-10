@@ -136,10 +136,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             name (string): The name of the event.
             date_u (datetime): The date of the event.
         """
-        start = date_u + 'T' + '0000' + 'Z'
-        start = start.strftime("%Y%m%dT%H%M%SZ")
-        end = date_u + 'T' + '2359' + 'Z'
-        end = end.strftime("%Y%m%dT%H%M%SZ")
+        date_full = date_u.strftime("%Y%m%d")
         now = datetime.now().strftime("%Y%m%dT%H%M%SZ")
         uid = self.calendar.timegm(time.gmtime())
         new_event = """BEGIN:VCALENDAR
@@ -148,12 +145,11 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         BEGIN:VEVENT
         UID: {}
         DTSTAMP:{}
-        DTSTART:{}
-        DTEND:{}
+        DTVALUE:{}
         SUMMARY:{}
         END:VEVENT
         END:VCALENDAR
-        """.format(uid, now, start, end, name)
+        """.format(uid, now, date_full, name)
         self.calendar.save_event(new_event)
         self.log.info('Create event was successful')
         return True
