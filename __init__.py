@@ -11,7 +11,7 @@ They include neccessary login information for NextCloud.
   A: "Your next appointment is on June 22th at 12:30 and is entitled Speech Interaction Class"
 """
 
-from datetime import datetime, timedelta, time, date
+from datetime import datetime, timedelta, time, date, timezone
 import caldav
 from caldav.elements import dav, cdav
 # from tzlocal import get_localzone
@@ -118,7 +118,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             apmnt_time (str): The Time of the occasion.
             apmnt_title (str): The Title of the Appointment.
         """
-        start = datetime.now()
+        start = datetime.utcnow()
         if from_start is not None:
             start = from_start
         end = start + timedelta(days-1)
@@ -126,6 +126,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         events = []
         for event in results:
             start_e = event.instance.vevent.dtstart.value
+            start_e = utc_to_local(start_e)
             summary = event.instance.vevent.summary.value
             events.append([start_e, summary])
         if len(events) > 0:
@@ -136,6 +137,9 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             return [get_nice_event(event) for event in events]
         self.log.info("There is no event")
         return "", "", ""
+
+def utc_to_local(utc_dt):
+    return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
 
 def get_nice_event(event):
     """Transforms Events nicely spoken for Mycroft.
@@ -154,10 +158,13 @@ def get_nice_event(event):
         apmnt_title (str): The Title of the Appointment.
     """
     print(event)
-    apmnt_date = nice_datetime(event[0])
-    apmnt_time = nice_time(event[1], speech=False, use_ampm=True)
-    if event[3]:
+    if type(event[1]) is str:
+        apmnt_date = nice_date(event[0])
         apmnt_time = "all day"
+    else:
+        apmnt_date = nice_date(event[0])
+        apmnt_time = nice_time(event[1], speech=False, use_ampm=True)
+
     apmnt_title = str(event[2])
     return apmnt_date, apmnt_time, apmnt_title
 
