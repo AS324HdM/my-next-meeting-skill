@@ -1,1 +1,2 @@
-Rename (the | ) (event | meeting | appointment) (on | at | for) {date} to {name}
+(Rename | Change) (the | ) (event | meeting | appointment) (on | at | for) {date} to {name}
+Set (the | ) (title | name) of (the | ) (event | meeting | appointment) (on | at | for) {date} to {name}
