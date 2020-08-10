@@ -126,7 +126,8 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         events = []
         for event in results:
             start_e = event.instance.vevent.dtstart.value
-            start_e = utc_to_local(start_e)
+            if type(event[0]) is not datetime.date:
+                start_e = utc_to_local(start_e)
             summary = event.instance.vevent.summary.value
             events.append([start_e, summary])
         if len(events) > 0:
@@ -158,7 +159,7 @@ def get_nice_event(event):
         apmnt_title (str): The Title of the Appointment.
     """
     print(event)
-    if type(event[1]) is str:
+    if type(event[0]) is datetime.date:
         apmnt_date = nice_date(event[0])
         apmnt_time = "all day"
     else:
