@@ -108,6 +108,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             start = get_date(message.data)
             list_of_events = self.get_appointment_info(start, 1, False)
             if len(list_of_events) > 0:
+                self.log.info(list_of_events)
                 events_string = ' and '.join(event[1]+event[0]\
                     for event in list_of_events)
                 self.speak('On '+nice_date(start)+\
@@ -295,8 +296,6 @@ def get_nice_event(event, is_on_date=False):
         if is_on_date:
             apmnt_date_time = ", at " + apmnt_date_time
     apmnt_title = str(event[1])
-    print(apmnt_date_time)
-    print(apmnt_title)
     return apmnt_date_time, apmnt_title
 
 def month_to_num(month):
