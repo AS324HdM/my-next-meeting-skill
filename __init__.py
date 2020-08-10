@@ -11,11 +11,10 @@ They include neccessary login information for NextCloud.
   Q: "Hey Mycroft, when is my next appointment?"
   A: "Your next appointment is on June 22th at 12:30 and is entitled Speech Interaction Class"
 """
-
+import re
 from datetime import datetime, timedelta, time, date, timezone
 from pytz import timezone as tz
 from dateutil.relativedelta import relativedelta
-import re
 import caldav
 from caldav.elements import dav, cdav
 # from tzlocal import get_localzone
@@ -115,7 +114,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             events_string = ' and '.join(event[1]+event[0]\
                 for event in list_of_events)
             self.speak('On '+nice_date(start)+\
-                ' you have the following appointments:'+\
+                ' you have the following appointments: '+\
                     events_string)
         else:
             self.speak('You Don\'t have any appointments planned')
@@ -140,7 +139,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             self.speak('Sorry, meeting could not be created, try'+ \
                 '"Set up an appointment with the name <name> on <date> for <duration>')
 
-    def createEvent(self, name, date_u, duration):
+    def create_event(self, name, date_u, duration):
         """Create an event for the NextCloud calendar.
         Args:
             name (string): The name of the event.
@@ -156,7 +155,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             end = start.strftime("%Y%m%dT%H%M%SZ")
             now = datetime.now().strftime("%Y%m%dT%H%M%SZ")
             uid = self.calendar.timegm(time.gmtime())
-            newEvent = """BEGIN:VCALENDAR
+            new_event = """BEGIN:VCALENDAR
             VERSION:2.0
             PRODID:-//Example Corp.//CalDAV Client//EN
             BEGIN:VEVENT
@@ -168,12 +167,63 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             END:VEVENT
             END:VCALENDAR
             """.format(uid, now, start, end, name)
-            self.calendar.save_event(newEvent) 
+            self.calendar.save_event(new_event)
             self.log.info('Create event was successful')
             return True
-        except:
+        except BaseException:
             self.log.info('Create event failed')
             return False
+
+    @intent_file_handler('meeting.delete.intent')
+    def handle_meeting_delete(self, message):
+        """Method is called when user speaks an intent in ``meeting.next.my.intent``.
+
+        Calls the methods login_to_nextcloud() and get_next_appointment_info() to get
+        the info of the users next appointment and gives the answer.
+
+        speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
+        """
+        date_u = extract_datetime(message.data.get('date'))[0]
+        events = self.calendar.date_search(date_u, date_u + timedelta(1))
+        summary = ""
+        if len(events) > 0:
+            try:
+                summary = events[0].instance.vevent.summary.value
+                events[0].delete()
+                self.speak('event: '+summary+' deleted')
+            except BaseException:
+                self.speak('event couldnot be deleted')
+        else:
+            self.speak('Sorry, no event to delete')
+
+        #self.speak('Sorry, meeting could not be deleted, try'+ \
+            #'"Set up an appointment with the name <name> on <date> for <duration>')
+
+    @intent_file_handler('meeting.rename.intent')
+    def handle_meeting_rename(self, message):
+        """Method is called when user speaks an intent in ``meeting.next.my.intent``.
+
+        Calls the methods login_to_nextcloud() and get_next_appointment_info() to get
+        the info of the users next appointment and gives the answer.
+
+        speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
+        """
+        date_u = extract_datetime(message.data.get('date'))[0]
+        events = self.calendar.date_search(date_u, date_u + timedelta(1))
+        name = message.data.get('name')
+        summary = ""
+        if len(events) > 0:
+            try:
+                summary = events[0].instance.vevent.summary.value
+                events[0].vobject_instance.vevent.summary.value = name
+                self.speak('event: '+summary+' renamed to '+name)
+            except BaseException:
+                self.speak('event couldnot be renamed')
+        else:
+            self.speak('Sorry, no event to rename')
+
+        #self.speak('Sorry, meeting could not be deleted, try'+ \
+            #'"Set up an appointment with the name <name> on <date> for <duration>')
 
     def get_appointment_info(self, from_start=None, days=30, get_next=True):
         """Get the next appointment from the NextCloud calendar.
@@ -214,20 +264,28 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         self.log.info("There is no event")
         return "", ""
 
-    def utc_to_local(self, dt):
+    def utc_to_local(self, date_arg):
         """Transforms time to local time.
 
         Args:
-            utc_dt (datetime): UTC datetime Object
+            date_arg (datetime): UTC datetime Object
 
         Returns:
             (datetime): Local datetime Object
 
         """
         time_zone = tz(self.timezone)
-        return dt.astimezone(time_zone).replace(tzinfo=None)
+        return date_arg.astimezone(time_zone).replace(tzinfo=None)
 
 def get_date(message_data):
+    """get a datetime from input.
+
+    Args:
+        message_data (object): all data input from user
+
+    Returns:
+        (datetime): datetime Object
+    """
     day = int(re.findall(r'\d+', message_data.get('day'))[0])
     month = month_to_num(message_data.get('month'))
     now = datetime.now()
