@@ -1,6 +1,9 @@
-what (appointments | meetings) do I have (at | on) the {day} of {month}
-what (appointments | meetings) do I have (at | on) {day} of {month}
-what (appointments | meetings) do I have (at | on) {month} {day}
-Do I have (an appointment | a meeting | appointments | meetings | time) (at | on) the {day} of {month}
-Do I have (an appointment | a meeting | appointments | meetings | time) (at | on) {day} of {month}
-Do I have (an appointment | a meeting | appointments | meetings | time) (at | on) {month} {day}
+what (appointments | meetings) do I have (at | for | on) the {day} of {month}
+what (appointments | meetings) do I have (at | for | on) {day} of {month}
+what (appointments | meetings) do I have (at | for | on) {month} {day}
+Do I have (an appointment | a meeting | appointments | meetings | time) (at | for | on) the {day} of {month}
+Do I have (an appointment | a meeting | appointments | meetings | time) (at | for | on) {day} of {month}
+Do I have (an appointment | a meeting | appointments | meetings | time) (at | for | on) {month} {day}
+(Give | Tell | Show) me (the | all | ) (appointments | meetings) (at | for | on) the {day} of {month}
+(Give | Tell | Show) me (the | all | ) (appointments | meetings) (at | for | on) {day} of {month}
+(Give | Tell | Show) me (the | all | ) (appointments | meetings) (at | for | on) {month} {day}
