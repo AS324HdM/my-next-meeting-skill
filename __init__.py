@@ -107,13 +107,11 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         month = month_to_num(message.data.get('month'))
         now = datetime.now()
         year = now.year
-        date_asked = "{}-{}-{}".format(year, month, day)
-        start = date_asked + ' 00:00:00.0'
-        start = datetime. strptime(start, '%Y-%m-%d %H:%M:%S.%f')
+        start = datetime(year, month, day)
         list_of_events = self.get_appointment_info(start, 1, False)
         if list_of_events > 0:
             list_of_events_string = ' and '.join(list_of_events)
-            nice_date_asked = nice_date(date_asked)
+            nice_date_asked = nice_date(start)
             self.speak('On' + nice_date_asked + \
                 ', you have following meetings:' +\
                     list_of_events_string)
@@ -148,7 +146,9 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             summary = event.instance.vevent.summary.value
             events.append([start_e, summary])
         if len(events) > 0:
-            events = sorted(events, key=lambda event: event[0])
+            events = sorted(events, key=lambda event: \
+                datetime.combine(event[0], datetime.min.time())\
+                    if isinstance(event[0], date) else event[0])
             if get_next:
                 event = events[0]
                 return get_nice_event(events[0])
