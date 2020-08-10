@@ -145,7 +145,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             BEGIN:VEVENT
             UID: {}
             DTSTAMP:{}
-            DTVALUE:{}
+            DTSTART;VALUE=DATE:{}
             SUMMARY:{}
             END:VEVENT
             END:VCALENDAR""".format(uid, now, date_full, name)
