@@ -59,6 +59,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         self.register_entity_file('time.entity')
         self.settings_change_callback = self.on_settings_changed # pylint: disable=attribute-defined-outside-init
         self.on_settings_changed()
+        self.login_to_nextcloud()
 
     def on_settings_changed(self):
         """Get settings from Mycroft profile for NextCloud Login.
@@ -88,7 +89,6 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
 
         speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
         """
-        self.login_to_nextcloud()
         apmnt_date_time, apmnt_title = self.get_appointment_info()
         if len(apmnt_date_time) > 0:
             self.speak_dialog('meeting.next.my', \
@@ -105,7 +105,6 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
 
         speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
         """
-        self.login_to_nextcloud()
         print("Handle day intent")
         print(message.data)
         start = get_date(message.data)
