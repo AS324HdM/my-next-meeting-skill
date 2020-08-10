@@ -161,7 +161,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         self.log.info("There is no event")
         return "", ""
 
-def utc_to_local(utc_dt):
+def utc_to_local(dt):
     """Transforms time to local time.
 
     Args:
@@ -171,11 +171,8 @@ def utc_to_local(utc_dt):
         (datetime): Local datetime Object
 
     """
-    # utc_now = tz('utc').localize(datetime.utcnow()) # generic time
-    # here = utc_now.astimezone(tz('Europe/Berlin')).replace(tzinfo=None)
-    # offset = relativedelta(here, utc_now) 
-    # return utc_dt + timedelta(hours=offset.hour)
-    return tz('Europe/Berlin').localize(utc_dt)
+    time_zone = tz('Europe/Berlin')
+    return dt.astimezone(time_zone).replace(tzinfo=None)
 
 def get_nice_event(event, is_on_date=False):
     """Transforms Events nicely spoken for Mycroft.
