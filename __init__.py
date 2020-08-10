@@ -13,6 +13,8 @@ They include neccessary login information for NextCloud.
 """
 
 from datetime import datetime, timedelta, time, date, timezone
+from pytz import timezone as tz
+from dateutil.relativedelta import relativedelta
 import re
 import caldav
 from caldav.elements import dav, cdav
@@ -169,7 +171,10 @@ def utc_to_local(utc_dt):
         (datetime): Local datetime Object
 
     """
-    return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=timezone('Europe/Berlin'))
+    utc_now = tz('utc').localize(datetime.utcnow()) # generic time
+    here = utc_now.astimezone(tz('Europe/Berlin')).replace(tzinfo=None)
+    offset = relativedelta(here, utc_now) 
+    return utc_dt + timedelta(hours=offset.hour)
 
 def get_nice_event(event, is_on_date=False):
     """Transforms Events nicely spoken for Mycroft.
