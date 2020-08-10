@@ -104,16 +104,19 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
 
         speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
         """
-        start = get_date(message.data)
-        list_of_events = self.get_appointment_info(start, 1, False)
-        if len(list_of_events) > 0:
-            events_string = ' and '.join(event[1]+event[0]\
-                for event in list_of_events)
-            self.speak('On '+nice_date(start)+\
-                ' you have the following appointments: '+\
-                    events_string)
-        else:
-            self.speak('You Don\'t have any appointments planned')
+        try:
+            start = get_date(message.data)
+            list_of_events = self.get_appointment_info(start, 1, False)
+            if len(list_of_events) > 0:
+                events_string = ' and '.join(event[1]+event[0]\
+                    for event in list_of_events)
+                self.speak('On '+nice_date(start)+\
+                    ' you have the following appointments: '+\
+                        events_string)
+            else:
+                self.speak('You Don\'t have any appointments planned')
+        except TypeError:
+            self.speak('Sorry, I need you to tell me a month and day')
 
     @intent_file_handler('meeting.create.intent')
     def handle_meeting_create(self, message):
@@ -124,11 +127,14 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
 
         speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
         """
-        name = message.data.get('name')
-        date_u = get_date(message.data)
+        try:
+            name = message.data.get('name')
+            date_u = get_date(message.data)
 
-        self.create_event(name, date_u)
-        self.speak_dialog('meeting created')
+            self.create_event(name, date_u)
+            self.speak_dialog('meeting created')
+        except TypeError:
+            self.speak('Sorry, cannot create event, I need you to tell me a month and day')
 
     def create_event(self, name, date_u):
         """Create an event for the NextCloud calendar.
@@ -164,15 +170,20 @@ END:VCALENDAR"""
 
         speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
         """
-        date_u = get_date(message.data)
-        events = self.calendar.date_search(date_u, date_u + timedelta(1))
-        summary = ""
-        if len(events) > 0:
-            summary = events[0].instance.vevent.summary.value
-            events[0].delete()
-            self.speak('event: '+summary+' deleted')
-        else:
-            self.speak('Sorry, no event to delete')
+        try:
+            date_u = get_date(message.data)
+            events = self.calendar.date_search(date_u, date_u + timedelta(1))
+            summary = ""
+            if len(events) > 0:
+                summary = events[0].instance.vevent.summary.value
+                events[0].delete()
+                self.speak('event: '+summary+' deleted')
+            else:
+                self.speak('Sorry, no event to delete')
+        except TypeError:
+            self.speak('Sorry, no event to delete, I need you to tell me a month and day')
+
+
 
     @intent_file_handler('meeting.rename.intent')
     def handle_meeting_rename(self, message):
@@ -284,6 +295,8 @@ def get_nice_event(event, is_on_date=False):
         if is_on_date:
             apmnt_date_time = ", at " + apmnt_date_time
     apmnt_title = str(event[1])
+    print(apmnt_date_time)
+    print(apmnt_title)
     return apmnt_date_time, apmnt_title
 
 def month_to_num(month):
