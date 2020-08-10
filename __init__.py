@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=unidiomatic-typecheck
 """Mycroft Skill that handles requests on a private NextCloud calendar.
 
 This Skill is activated via Mycroft by one of the key sentences in meeting.my.next.intent.
@@ -110,7 +111,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         year = int(now.year)
         start = datetime(year, month, day)
         list_of_events = self.get_appointment_info(start, 1, False)
-        if list_of_events > 0:
+        if len(list_of_events) > 0:
             list_of_events_string = ' and '.join(list_of_events)
             nice_date_asked = nice_date(start)
             self.speak('On' + nice_date_asked + \
