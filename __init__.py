@@ -231,6 +231,7 @@ END:VCALENDAR"""
         end = start + timedelta(days)
         self.log.info(end)
         results = self.calendar.date_search(start, end)
+        self.log.info("results:", results)
         events = []
         for event in results:
             start_e = event.instance.vevent.dtstart.value
@@ -247,7 +248,8 @@ END:VCALENDAR"""
                 return get_nice_event(events[0])
             return [get_nice_event(event, True) for event in events]
         self.log.info("There is no event")
-        if get_next: return []
+        if get_next: 
+            return []
         return "", ""
 
     def utc_to_local(self, date_arg):
