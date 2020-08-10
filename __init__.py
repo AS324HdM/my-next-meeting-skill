@@ -148,7 +148,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             events.append([start_e, summary])
         if len(events) > 0:
             events = sorted(events, key=lambda event: \
-                datetime.combine(event[0], datetime.min.time())\
+                datetime.combine(event[0], datetime.min.time()).replace(tzinfo=None)\
                     if type(event[0]) is date else event[0])
             if get_next:
                 event = events[0]
