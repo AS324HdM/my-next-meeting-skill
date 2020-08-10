@@ -150,9 +150,9 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         start_time = '000000'
         end_time = '235959'
         date_u = date_u.strftime("%Y%m%d")
-        start = date_u + 'T' + str(start_time)
-        end = date_u + 'T' + str(end_time)
-        now = datetime.now().strftime("%Y%m%dT%H%M%S")
+        start = date_u + 'T' + str(start_time) +'Z'
+        end = date_u + 'T' + str(end_time) +'Z'
+        now = datetime.now().strftime("%Y%m%dT%H%M%SZ")
         uid = datetime.now().timestamp()
         new_event = """
 BEGIN:VCALENDAR
