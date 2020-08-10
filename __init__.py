@@ -103,8 +103,8 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         # self.login_to_nextcloud()
         print("Handle day intent")
         print(message.data)
-        day = re.findall(r'\d+',message.data.day)[0]
-        month = month_to_num(message.data.month)
+        day = re.findall(r'\d+',message.data.get('day'))[0]
+        month = month_to_num(message.data.get('month'))
         now = datetime.datetime.now()
         year = now.year
         date = "{}-{}-{}".format(year, month, day)
@@ -137,7 +137,8 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         events = []
         for event in results:
             start_e = event.instance.vevent.dtstart.value
-            if isinstance(start_e, datetime.datetime):
+            print(start_e)
+            if isinstance(start_e, datetime):
                 start_e = utc_to_local(start_e)
             summary = event.instance.vevent.summary.value
             events.append([start_e, summary])
