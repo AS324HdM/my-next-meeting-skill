@@ -13,3 +13,7 @@ skillMetadata:
           type: password
           label: Password
           value: ""
+        - name: timezone
+          type: text
+          label: timezone
+          value: "Europe/Berlin"

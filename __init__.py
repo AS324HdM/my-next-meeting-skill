@@ -42,6 +42,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         from the Skill's initialize method.
         """
         MycroftSkill.__init__(self)
+        self.timezone = "Europe/Berlin"
         self.caldav = ""
         self.calendar = {}
 
@@ -64,6 +65,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         """
         user_name = self.settings.get('username')
         password = self.settings.get('password')
+        self.timezone = self.settings.get('timezone')
         self.caldav = "https://{}:{}@next.social-robot.info/nc/remote.php/dav" \
             .format(user_name, password)
 
@@ -147,12 +149,12 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             print(start_e)
             print(type(start_e))
             if type(start_e) is datetime:
-                start_e = utc_to_local(start_e)
+                start_e = self.utc_to_local(start_e)
             summary = event.instance.vevent.summary.value
             events.append([start_e, summary])
         if len(events) > 0:
             events = sorted(events, key=lambda event: \
-                utc_to_local(datetime.combine(event[0], datetime.min.time()))\
+                self.utc_to_local(datetime.combine(event[0], datetime.min.time()))\
                     if type(event[0]) is date else event[0])
             if get_next:
                 event = events[0]
@@ -161,18 +163,18 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         self.log.info("There is no event")
         return "", ""
 
-def utc_to_local(dt):
-    """Transforms time to local time.
+    def utc_to_local(self, dt):
+        """Transforms time to local time.
 
-    Args:
-        utc_dt (datetime): UTC datetime Object
+        Args:
+            utc_dt (datetime): UTC datetime Object
 
-    Returns:
-        (datetime): Local datetime Object
+        Returns:
+            (datetime): Local datetime Object
 
-    """
-    time_zone = tz('Europe/Berlin')
-    return dt.astimezone(time_zone).replace(tzinfo=None)
+        """
+        time_zone = tz(self.timezone)
+        return dt.astimezone(time_zone).replace(tzinfo=None)
 
 def get_nice_event(event, is_on_date=False):
     """Transforms Events nicely spoken for Mycroft.
