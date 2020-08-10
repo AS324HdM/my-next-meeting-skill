@@ -17,7 +17,7 @@ from caldav.elements import dav, cdav
 # from tzlocal import get_localzone
 from adapt.intent import IntentBuilder # import for Mycroft only works internaly pylint: disable=import-error
 from mycroft import MycroftSkill, intent_file_handler # import for Mycroft only works internaly pylint: disable=import-error
-from mycroft.util.format import nice_date, nice_duration, nice_time # import for Mycroft only works internaly pylint: disable=import-error
+from mycroft.util.format import nice_date, nice_date_time # import for Mycroft only works internaly pylint: disable=import-error
 
 class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-many-instance-attributes
     """Main Class for the Skill.
@@ -83,10 +83,10 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
         """
         self.login_to_nextcloud()
-        apmnt_date, apmnt_time, apmnt_title = self.get_appointment_info()
+        apmnt_date_time, apmnt_title = self.get_appointment_info()
         if len(apmnt_date) > 0:
             self.speak_dialog('meeting.next.my', \
-                data={"date": apmnt_date, "time": apmnt_time, "title": apmnt_title})
+                data={"date_time": apmnt_date_time, "title": apmnt_title})
         else:
             self.speak('You Don\'t have any appointments planned')
 
@@ -126,7 +126,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         events = []
         for event in results:
             start_e = event.instance.vevent.dtstart.value
-            if type(start_e[0]) is not datetime.date:
+            if len(str(start_e)) <= 10:
                 start_e = utc_to_local(start_e)
             summary = event.instance.vevent.summary.value
             events.append([start_e, summary])
@@ -137,7 +137,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
                 return get_nice_event(events[0])
             return [get_nice_event(event) for event in events]
         self.log.info("There is no event")
-        return "", "", ""
+        return "", ""
 
 def utc_to_local(utc_dt):
     return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
@@ -159,15 +159,12 @@ def get_nice_event(event):
         apmnt_title (str): The Title of the Appointment.
     """
     print(event)
-    if type(event[0]) is datetime.date:
-        apmnt_date = nice_date(event[0])
-        apmnt_time = "all day"
+    if len(str(event[0])) <= 10:
+        apmnt_date_time = nice_date(event[0]) + " all day "
     else:
-        apmnt_date = nice_date(event[0])
-        apmnt_time = nice_time(event[1], speech=False, use_ampm=True)
-
-    apmnt_title = str(event[2])
-    return apmnt_date, apmnt_time, apmnt_title
+        apmnt_date_time = nice_date_time(event[0])
+    apmnt_title = str(event[1])
+    return apmnt_date_time, apmnt_title
 
 def create_skill():
     """Create the skill instance
