@@ -171,11 +171,11 @@ def utc_to_local(utc_dt):
         (datetime): Local datetime Object
 
     """
-   # utc_now = tz('utc').localize(datetime.utcnow()) # generic time
-   # here = utc_now.astimezone(tz('Europe/Berlin')).replace(tzinfo=None)
-   # offset = relativedelta(here, utc_now) 
-   # return utc_dt + timedelta(hours=offset.hour)
-   return tz('Europe/Berlin').localize(utc_dt)
+    # utc_now = tz('utc').localize(datetime.utcnow()) # generic time
+    # here = utc_now.astimezone(tz('Europe/Berlin')).replace(tzinfo=None)
+    # offset = relativedelta(here, utc_now) 
+    # return utc_dt + timedelta(hours=offset.hour)
+    return tz('Europe/Berlin').localize(utc_dt)
 
 def get_nice_event(event, is_on_date=False):
     """Transforms Events nicely spoken for Mycroft.
