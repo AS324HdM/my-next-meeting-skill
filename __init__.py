@@ -148,7 +148,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             summary = event.instance.vevent.summary.value
             events.append([start_e, summary])
         if len(events) > 0:
-            events = sorted(events, key=lambda event: event[1] and event[0])
+            events = sorted(events, key=lambda event: event[0])
             if get_next:
                 event = events[0]
                 return get_nice_event(events[0])
