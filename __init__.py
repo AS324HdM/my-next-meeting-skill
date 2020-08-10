@@ -38,9 +38,6 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         from the Skill's initialize method.
         """
         MycroftSkill.__init__(self)
-        self.register_entity_file('day.entity')
-        self.register_entity_file('month.entity')
-        self.register_entity_file('weekday.entity')
         self.caldav = ""
         self.calendar = {}
 
@@ -52,6 +49,9 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         It is used to perform any final setup for the Skill
         including accessing Skill settings.
         """
+        self.register_entity_file('day.entity')
+        self.register_entity_file('month.entity')
+        self.register_entity_file('weekday.entity')
         self.settings_change_callback = self.on_settings_changed # pylint: disable=attribute-defined-outside-init
         self.on_settings_changed()
 
