@@ -172,7 +172,7 @@ def get_nice_event(event):
         apmnt_title (str): The Title of the Appointment.
     """
     print(event)
-    if isinstance(event[0], datetime.date):
+    if isinstance(event[0], date):
         apmnt_date_time = nice_date(event[0]) + " all day "
     else:
         apmnt_date_time = nice_date_time(event[0])
