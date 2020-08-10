@@ -105,7 +105,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         print(message.data)
         day = re.findall(r'\d+',message.data.get('day'))[0]
         month = month_to_num(message.data.get('month'))
-        now = datetime.datetime.now()
+        now = datetime.now()
         year = now.year
         date = "{}-{}-{}".format(year, month, day)
         start = date + ' 00:00:00.0'
