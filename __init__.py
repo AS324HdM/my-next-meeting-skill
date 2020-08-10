@@ -12,9 +12,9 @@ They include neccessary login information for NextCloud.
 """
 
 from datetime import datetime, timedelta, time, date, timezone
+import re
 import caldav
 from caldav.elements import dav, cdav
-import re
 # from tzlocal import get_localzone
 from adapt.intent import IntentBuilder # import for Mycroft only works internaly pylint: disable=import-error
 from mycroft import MycroftSkill, intent_file_handler # import for Mycroft only works internaly pylint: disable=import-error
@@ -103,17 +103,22 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         # self.login_to_nextcloud()
         print("Handle day intent")
         print(message.data)
-        day = re.findall(r'\d+',message.data.get('day'))[0]
+        day = re.findall(r'\d+', message.data.get('day'))[0]
         month = month_to_num(message.data.get('month'))
         now = datetime.now()
         year = now.year
-        date = "{}-{}-{}".format(year, month, day)
-        start = date + ' 00:00:00.0'
-        end = date + ' 23:59:00.0'
+        date_asked = "{}-{}-{}".format(year, month, day)
+        start = date_asked + ' 00:00:00.0'
         start = datetime. strptime(start, '%Y-%m-%d %H:%M:%S.%f')
-        end = datetime. strptime(end, '%Y-%m-%d %H:%M:%S.%f')
-        # apmnt_date, apmnt_time, apmnt_title = \
-            # self.get_appointment_info(from_start=day, days=1, get_next=False)
+        list_of_events = self.get_appointment_info(start, 1, False)
+        if list_of_events > 0:
+            list_of_events_string = ' and '.join(list_of_events)
+            nice_date_asked = nice_date(date_asked)
+            self.speak('On' + nice_date_asked + \
+                ', you have following meetings:' +\
+                    list_of_events_string)
+        else:
+            self.speak('You Don\'t have any appointments planned')
 
     def get_appointment_info(self, from_start=None, days=30, get_next=True):
         """Get the next appointment from the NextCloud calendar.
@@ -152,7 +157,15 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         return "", ""
 
 def utc_to_local(utc_dt):
-    print(utc_dt)
+    """Transforms time to local time.
+
+    Args:
+        utc_dt (datetime): UTC datetime Object
+
+    Returns:
+        (datetime): Local datetime Object
+
+    """
     return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
 
 def get_nice_event(event):
@@ -173,13 +186,21 @@ def get_nice_event(event):
     """
     print(event)
     if isinstance(event[0], date):
-        apmnt_date_time = nice_date(event[0]) + " all day "
+        apmnt_date_time = nice_date(event[0]) + ", all day "
     else:
         apmnt_date_time = nice_date_time(event[0])
     apmnt_title = str(event[1])
     return apmnt_date_time, apmnt_title
 
 def month_to_num(month):
+    """Transforms the spoken month to numbers.
+
+    Args:
+        month (str): spoken month
+
+    Returns:
+        (int): Number of month
+    """
     switcher = {
         "january":1,
         "february":2,
