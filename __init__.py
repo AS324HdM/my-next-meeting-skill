@@ -38,6 +38,9 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         from the Skill's initialize method.
         """
         MycroftSkill.__init__(self)
+        self.register_entity_file('day.entity')
+        self.register_entity_file('month.entity')
+        self.register_entity_file('weekday.entity')
         self.caldav = ""
         self.calendar = {}
 
@@ -123,13 +126,11 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         events = []
         for event in results:
             start_e = event.instance.vevent.dtstart.value
-            #start_e = start_e.astimezone(get_localzone())
-            if not hasattr(start_e, 'time'):
-                start_e = datetime.combine(start_e, datetime.min.time())
             day = start_e.date()
             day_time = start_e.time()
             summary = event.instance.vevent.summary.value
-            events.append([day, day_time, summary])
+            is_full_day = len(str(start_e)) == 10
+            events.append([day, day_time, summary, is_full_day])
         if len(events) > 0:
             events = sorted(events, key=lambda event: event[1] and event[0])
             if get_next:
@@ -157,6 +158,8 @@ def get_nice_event(event):
     """
     apmnt_date = nice_date(event[0])
     apmnt_time = nice_time(event[1], speech=False, use_ampm=True)
+    if event[3]:
+        apmnt_time = "all day"
     apmnt_title = str(event[2])
     return apmnt_date, apmnt_time, apmnt_title
 
