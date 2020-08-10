@@ -2,7 +2,7 @@
 Reads your next appointment from nextcloud calendar
 
 ## About
-Answers with your next appointment, it reads from your private NextCloud calendar
+It reads and writes from your private NextCloud calendar
 
 ## Install
 msm -l install https://github.com/AS324/my-next-meeting-skill
@@ -10,18 +10,15 @@ msm -l install https://github.com/AS324/my-next-meeting-skill
 ## Update
 msm -l update https://github.com/AS324/my-next-meeting-skill
 
+## Description
+With my-next-meeting-skill you can query the NextCloud calendar when the next appointment is and which appointments will take place on a certain day. You can also create a new appointment, delete an existing appointment or change the name of an existing appointment.
+
 ## Examples
-* "When is my next meeting"
-* "Next meeting"
-* "Do i have time"
-* "When is the next meeting"
-* "Wann ist mein nächstes meeting"
-* "Habe ich zeit"
-* "Wann ist das nächste meeting"
-* "Wann ist mein nächster termin"
-* "When is my next appointment"
-* "When is the next appointment"
-* "Wann ist der nächste termin"
+- Next appointment: "When my next appointment?"
+- Appointments at day X: "What appointments do I have at {month} {day}?" "Do I have appointments at the {day} of {month}?"
+- create appointment: "Create an appointment with the name {name} on the {day} of {month}."
+- delete appointment: "Delete the appointment at the {day} of {month}."
+- rename appointment: "Rename the appointment for {date} to {name}."
 
 ## Credits
 Annika Strauß, Jessica Hofmann
