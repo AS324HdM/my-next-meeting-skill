@@ -144,6 +144,8 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         Args:
             name (string): The name of the event.
             date_u (datetime): The date of the event.
+        Returns:
+            True (bool): True. 
         """
         date_full = date_u.strftime("%Y%m%d")
         now = datetime.now().strftime("%Y%m%dT%H%M%SZ")
@@ -217,11 +219,10 @@ END:VCALENDAR"""
             If None, from now on.
             days (int): The Range of time to look up from ``from_start`` on.
             F.e. if ``from_start`` is 1.10, it will look up only the Time from 1.10 to 31.10.
+            get_next(bool): If True, just the next appointment. If False, all appointments.
 
         Returns:
-            apmnt_date (str): The Date of the next appointment as String.
-            apmnt_time (str): The Time of the occasion.
-            apmnt_title (str): The Title of the Appointment.
+            (array): Array of the three Strings apmnt_date, apmnt_time, apmnt_title
         """
         start = datetime.utcnow()
         if from_start is not None:
@@ -291,8 +292,7 @@ def get_nice_event(event, is_on_date=False):
         event: Event extracted from Nextcloud.
 
     Returns:
-        apmnt_date (str): The Date of the next appointment  nicely spoken String.
-        apmnt_time (str): The Time of the occasion nicely spoken String.
+        apmnt_date_time (str): The Date and Time of the next appointment  nicely spoken String.
         apmnt_title (str): The Title of the Appointment.
     """
     if type(event[0]) is date:
