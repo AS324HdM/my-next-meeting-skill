@@ -1,3 +1,2 @@
-(Create | Make | Set up) ( | an | a) (event | meeting | appointment) (with the name | called | ) {name} (on | at | for) {date} (for | lasting | ) {duration}
-(Create | Make | Set up) ( | an | a) (event | meeting | appointment) (on | at | for) {date} (for | lasting | ) {duration} (with the name | called | ) {name}
-
+(Create | Make | Set up) ( | an | a) (event | meeting | appointment) (with the name | called | ) {name} (on | at | for) (the | ) ({day} of {month} | {month} {day})
+(Create | Make | Set up) ( | an | a) (event | meeting | appointment) (on | at | for) (the | ) ({day} of {month} | {month} {day}) (with the name | called | ) {name}

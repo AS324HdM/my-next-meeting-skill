@@ -56,7 +56,6 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         """
         self.register_entity_file('day.entity')
         self.register_entity_file('month.entity')
-        self.register_entity_file('time.entity')
         self.settings_change_callback = self.on_settings_changed # pylint: disable=attribute-defined-outside-init
         self.on_settings_changed()
         self.login_to_nextcloud()
@@ -105,8 +104,6 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
 
         speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
         """
-        print("Handle day intent")
-        print(message.data)
         start = get_date(message.data)
         list_of_events = self.get_appointment_info(start, 1, False)
         if len(list_of_events) > 0:
@@ -128,50 +125,38 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
         """
         name = message.data.get('name')
-        date_u = extract_datetime(message.data.get('date'))[0]
-        duration = extract_duration(message.data.get('duration'))[0]
+        date_u = get_date(message.data)
 
-        success = self.create_event(name, date_u, duration)
-        if success:
-            self.speak_dialog('meeting created')
-        else:
-            self.speak('Sorry, meeting could not be created, try'+ \
-                '"Set up an appointment with the name <name> on <date> for <duration>')
+        self.create_event(name, date_u)
+        self.speak_dialog('meeting created')
 
-    def create_event(self, name, date_u, duration):
+    def create_event(self, name, date_u):
         """Create an event for the NextCloud calendar.
         Args:
             name (string): The name of the event.
             date_u (datetime): The date of the event.
-            duration (timedelta): Duration of the event.
-
-        Returns:
-            True if succeeds, else False
         """
-        try:
-            start = date_u.strftime("%Y%m%dT%H%M%SZ")
-            end = date_u + duration
-            end = start.strftime("%Y%m%dT%H%M%SZ")
-            now = datetime.now().strftime("%Y%m%dT%H%M%SZ")
-            uid = self.calendar.timegm(time.gmtime())
-            new_event = """BEGIN:VCALENDAR
-            VERSION:2.0
-            PRODID:-//Example Corp.//CalDAV Client//EN
-            BEGIN:VEVENT
-            UID: {}
-            DTSTAMP:{}
-            DTSTART:{}
-            DTEND:{}
-            SUMMARY:{}
-            END:VEVENT
-            END:VCALENDAR
-            """.format(uid, now, start, end, name)
-            self.calendar.save_event(new_event)
-            self.log.info('Create event was successful')
-            return True
-        except BaseException:
-            self.log.info('Create event failed')
-            return False
+        start = date_u + 'T' + '0000' + 'Z'
+        start = start.strftime("%Y%m%dT%H%M%SZ")
+        end = date_u + 'T' + '2359' + 'Z'
+        end = end.strftime("%Y%m%dT%H%M%SZ")
+        now = datetime.now().strftime("%Y%m%dT%H%M%SZ")
+        uid = self.calendar.timegm(time.gmtime())
+        new_event = """BEGIN:VCALENDAR
+        VERSION:2.0
+        PRODID:-//Example Corp.//CalDAV Client//EN
+        BEGIN:VEVENT
+        UID: {}
+        DTSTAMP:{}
+        DTSTART:{}
+        DTEND:{}
+        SUMMARY:{}
+        END:VEVENT
+        END:VCALENDAR
+        """.format(uid, now, start, end, name)
+        self.calendar.save_event(new_event)
+        self.log.info('Create event was successful')
+        return True
 
     @intent_file_handler('meeting.delete.intent')
     def handle_meeting_delete(self, message):
@@ -182,21 +167,15 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
 
         speak() is a build-in MycroftSkill method, to let mycroft speak to the user.
         """
-        date_u = extract_datetime(message.data.get('date'))[0]
+        date_u = get_date(message.data)
         events = self.calendar.date_search(date_u, date_u + timedelta(1))
         summary = ""
         if len(events) > 0:
-            try:
-                summary = events[0].instance.vevent.summary.value
-                events[0].delete()
-                self.speak('event: '+summary+' deleted')
-            except BaseException:
-                self.speak('event couldnot be deleted')
+            summary = events[0].instance.vevent.summary.value
+            events[0].delete()
+            self.speak('event: '+summary+' deleted')
         else:
             self.speak('Sorry, no event to delete')
-
-        #self.speak('Sorry, meeting could not be deleted, try'+ \
-            #'"Set up an appointment with the name <name> on <date> for <duration>')
 
     @intent_file_handler('meeting.rename.intent')
     def handle_meeting_rename(self, message):
@@ -212,18 +191,12 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         name = message.data.get('name')
         summary = ""
         if len(events) > 0:
-            try:
-                summary = events[0].instance.vevent.summary.value
-                events[0].vobject_instance.vevent.summary.value = name
-                events[0].save()
-                self.speak('event: '+summary+' renamed to '+name)
-            except BaseException:
-                self.speak('event couldnot be renamed')
+            summary = events[0].instance.vevent.summary.value
+            events[0].vobject_instance.vevent.summary.value = name
+            events[0].save()
+            self.speak('event: '+summary+' renamed to '+name)
         else:
             self.speak('Sorry, no event to rename')
-
-        #self.speak('Sorry, meeting could not be deleted, try'+ \
-            #'"Set up an appointment with the name <name> on <date> for <duration>')
 
     def get_appointment_info(self, from_start=None, days=30, get_next=True):
         """Get the next appointment from the NextCloud calendar.
@@ -247,8 +220,6 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         events = []
         for event in results:
             start_e = event.instance.vevent.dtstart.value
-            print(start_e)
-            print(type(start_e))
             if type(start_e) is datetime:
                 start_e = self.utc_to_local(start_e)
             summary = event.instance.vevent.summary.value

@@ -1,1 +1,1 @@
-Delete (the | ) (event | meeting | appointment) (on | at | for) {date}
+Delete (the | ) (event | meeting | appointment) (on | at | for) (the | ) ({day} of {month} | {month} {day})
