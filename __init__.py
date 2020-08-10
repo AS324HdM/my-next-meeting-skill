@@ -112,7 +112,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         start = datetime(year, month, day)
         list_of_events = self.get_appointment_info(start, 1, False)
         if len(list_of_events) > 0:
-            events_string = ' and '.join(event[0]+event[1]\
+            events_string = ' and '.join(event[1]+event[0]\
                 for event in list_of_events)
             self.speak('On '+nice_date(start)+\
                 ' you have the following appointments:'+\
@@ -143,8 +143,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         for event in results:
             start_e = event.instance.vevent.dtstart.value
             print(start_e)
-            if type(start_e) is datetime:
-                start_e = utc_to_local(start_e)
+            start_e = utc_to_local(start_e)
             summary = event.instance.vevent.summary.value
             events.append([start_e, summary])
         if len(events) > 0:
