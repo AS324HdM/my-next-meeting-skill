@@ -103,10 +103,10 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         # self.login_to_nextcloud()
         print("Handle day intent")
         print(message.data)
-        day = re.findall(r'\d+', message.data.get('day'))[0]
+        day = int(re.findall(r'\d+', message.data.get('day'))[0])
         month = month_to_num(message.data.get('month'))
         now = datetime.now()
-        year = now.year
+        year = int(now.year)
         start = datetime(year, month, day)
         list_of_events = self.get_appointment_info(start, 1, False)
         if list_of_events > 0:
