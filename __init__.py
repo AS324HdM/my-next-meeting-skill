@@ -112,11 +112,11 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         start = datetime(year, month, day)
         list_of_events = self.get_appointment_info(start, 1, False)
         if len(list_of_events) > 0:
-            list_of_events_string = ' and '.join(list_of_events)
-            nice_date_asked = nice_date(start)
-            self.speak('On' + nice_date_asked + \
-                ', you have following meetings:' +\
-                    list_of_events_string)
+            events_string = ' and '.join(event[0]+event[1]\
+                for event in list_of_events)
+            self.speak('On '+nice_date(start)+\
+                ' you have the following appointments:'+\
+                    events_string)
         else:
             self.speak('You Don\'t have any appointments planned')
 
@@ -149,12 +149,12 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             events.append([start_e, summary])
         if len(events) > 0:
             events = sorted(events, key=lambda event: \
-                datetime.combine(event[0], datetime.min.time()).replace(tzinfo=None)\
+                utc_to_local(datetime.combine(event[0], datetime.min.time()))\
                     if type(event[0]) is date else event[0])
             if get_next:
                 event = events[0]
                 return get_nice_event(events[0])
-            return [get_nice_event(event) for event in events]
+            return [get_nice_event(event, True) for event in events]
         self.log.info("There is no event")
         return "", ""
 
@@ -170,7 +170,7 @@ def utc_to_local(utc_dt):
     """
     return utc_dt.replace(tzinfo=timezone.utc).astimezone(tz=None)
 
-def get_nice_event(event):
+def get_nice_event(event, is_on_date=False):
     """Transforms Events nicely spoken for Mycroft.
 
     nice_date() and nice_time() are functions from Mycroft.util.format that
@@ -189,8 +189,12 @@ def get_nice_event(event):
     print(event)
     if type(event[0]) is date:
         apmnt_date_time = nice_date(event[0]) + ", all day "
+        if is_on_date:
+            apmnt_date_time = ", all day"
     else:
         apmnt_date_time = nice_date_time(event[0])
+        if is_on_date:
+            apmnt_date_time = ", at " + apmnt_date_time
     apmnt_title = str(event[1])
     return apmnt_date_time, apmnt_title
 
