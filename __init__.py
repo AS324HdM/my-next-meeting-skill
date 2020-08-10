@@ -137,7 +137,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         start = datetime.utcnow()
         if from_start is not None:
             start = from_start
-        end = start + timedelta(days-1)
+        end = start + timedelta(days)
         results = self.calendar.date_search(start, end)
         events = []
         for event in results:
