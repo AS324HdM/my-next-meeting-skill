@@ -215,6 +215,7 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
             try:
                 summary = events[0].instance.vevent.summary.value
                 events[0].vobject_instance.vevent.summary.value = name
+                events[0].save()
                 self.speak('event: '+summary+' renamed to '+name)
             except BaseException:
                 self.speak('event couldnot be renamed')
@@ -271,7 +272,6 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
 
         Returns:
             (datetime): Local datetime Object
-
         """
         time_zone = tz(self.timezone)
         return date_arg.astimezone(time_zone).replace(tzinfo=None)
