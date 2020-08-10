@@ -126,11 +126,8 @@ class MyNextMeeting(MycroftSkill): # attributes neccessary pylint: disable=too-m
         events = []
         for event in results:
             start_e = event.instance.vevent.dtstart.value
-            day = start_e.date()
-            day_time = start_e.time()
             summary = event.instance.vevent.summary.value
-            is_full_day = len(str(start_e)) == 10
-            events.append([day, day_time, summary, is_full_day])
+            events.append([start_e, summary])
         if len(events) > 0:
             events = sorted(events, key=lambda event: event[1] and event[0])
             if get_next:
@@ -149,14 +146,15 @@ def get_nice_event(event):
     https://mycroft-ai.gitbook.io/docs/mycroft-technologies/lingua-franca
 
     Args:
-        events: Events extracted from Nextcloud.
+        event: Event extracted from Nextcloud.
 
     Returns:
         apmnt_date (str): The Date of the next appointment  nicely spoken String.
         apmnt_time (str): The Time of the occasion nicely spoken String.
         apmnt_title (str): The Title of the Appointment.
     """
-    apmnt_date = nice_date(event[0])
+    print(event)
+    apmnt_date = nice_datetime(event[0])
     apmnt_time = nice_time(event[1], speech=False, use_ampm=True)
     if event[3]:
         apmnt_time = "all day"
